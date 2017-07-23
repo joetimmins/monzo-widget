@@ -1,0 +1,14 @@
+<resources>
+    <!-- Authentication -->
+    <string name="callback_url_scheme">https</string>
+    <string name="callback_url_host">monzowidget</string>
+
+    <!-- App strings -->
+    <string name="app_name">monzo widget</string>
+    <string name="login_action_title">Login</string>
+    <string name="login_follow_steps_body">Follow the steps to login</string>
+    <string name="login_redirecting_body">Redirecting to browser - please follow the instructions to send a
+        magic link email, then click on "Login to Monzo"</string>
+    <string name="login_logging_in_body">Logging you in…</string>
+    <string name="login_logged_in_body">Successfully logged in.\n\nDrag a widget to your homescreen and enjoy!</string>
+</resources>
