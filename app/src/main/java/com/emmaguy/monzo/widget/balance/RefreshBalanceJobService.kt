@@ -5,36 +5,31 @@ import android.app.job.JobParameters
 import android.app.job.JobService
 import com.emmaguy.monzo.widget.AppModule
 import com.emmaguy.monzo.widget.MonzoWidgetApp
-import com.emmaguy.monzo.widget.login.LoginModule
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
 
 class RefreshBalanceJobService : JobService() {
-    private lateinit var loginModule: LoginModule
+    private lateinit var balanceManager: BalanceManager
     private var disposable: Disposable? = null
 
     override fun onCreate() {
         super.onCreate()
 
-        loginModule = MonzoWidgetApp.get(this).loginModule
+        val app = MonzoWidgetApp.get(this)
+        balanceManager = BalanceManager(app.apiModule.monzoApi, app.storageModule.userStorage)
     }
 
     override fun onStartJob(jobParams: JobParameters?): Boolean {
-        val monzoApi = loginModule.provideMonzoApi()
-        val userStorage = loginModule.userStorage
-        val ioScheduler = AppModule.ioScheduler()
-
-        Timber.d("Refreshing balance")
-        disposable = monzoApi.balance(userStorage.prepaidAccountId!!)
-                .doOnSuccess { balance -> userStorage.prepaidBalance = balance }
-                .flatMap { monzoApi.balance(userStorage.currentAccountId!!) }
-                .doOnSuccess { balance -> userStorage.currentAccountBalance = balance }
-                .subscribeOn(ioScheduler)
-                .subscribe({ balance ->
-                    Timber.d("Successfully refreshed balances: " + balance)
+        disposable = balanceManager.refreshBalances()
+                .subscribeOn(AppModule.ioScheduler())
+                .subscribe({
+                    Timber.d("Successfully refreshed balance(s)")
                     jobFinished(jobParams, false)
                     BalanceWidgetProvider.updateAllWidgets(this)
-                }, { error -> Timber.e(error, "Failed to refresh balance") })
+                }, { error ->
+                    jobFinished(jobParams, false)
+                    Timber.e(error, "Failed to refresh balance(s)")
+                })
         return true
     }
 

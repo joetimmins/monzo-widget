@@ -1,20 +1,23 @@
 package com.emmaguy.monzo.widget
 
-import android.app.*
+import android.app.Application
 import android.content.Context
-import android.os.Build
+import com.emmaguy.monzo.widget.api.ApiModule
 import com.emmaguy.monzo.widget.login.LoginModule
-import com.readystatesoftware.chuck.Chuck
 import timber.log.Timber
 
 
 class MonzoWidgetApp : Application() {
+    lateinit var storageModule: StorageModule
+    lateinit var apiModule: ApiModule
     lateinit var loginModule: LoginModule
 
     override fun onCreate() {
         super.onCreate()
 
-        loginModule = LoginModule(this)
+        storageModule = StorageModule(this)
+        apiModule = ApiModule(this, storageModule)
+        loginModule = LoginModule(this, storageModule, apiModule)
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())

@@ -38,7 +38,7 @@ class BalanceWidgetProvider : AppWidgetProvider() {
         }
 
         private fun updateWidgets(context: Context, appWidgetIds: IntArray, appWidgetManager: AppWidgetManager) {
-            val userStorage = MonzoWidgetApp.get(context).loginModule.userStorage
+            val userStorage = MonzoWidgetApp.get(context).storageModule.userStorage
             val prepaidBalance = userStorage.prepaidBalance
             val currentAccountBalance = userStorage.currentAccountBalance
 
