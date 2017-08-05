@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.emmaguy.monzo.widget.api.model.Balance
 import com.emmaguy.monzo.widget.api.model.Token
+import com.emmaguy.monzo.widget.settings.SettingsPresenter
 
 class UserStorage(context: Context) {
     private val KEY_REFRESH_TOKEN = "KEY_REFRESH_TOKEN"
@@ -20,6 +21,8 @@ class UserStorage(context: Context) {
 
     private val KEY_CA_CURRENCY = "KEY_CA_CURRENCY"
     private val KEY_CA_BALANCE = "KEY_CA_BALANCE"
+
+    private val KEY_ACCOUNT_TYPE = "KEY_ACCOUNT_TYPE"
 
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("user_storage", Context.MODE_PRIVATE)
 
@@ -72,6 +75,24 @@ class UserStorage(context: Context) {
         set(id) {
             sharedPreferences.edit().putString(KEY_CURRENT_ACCOUNT_ID, id).apply()
         }
+
+    fun saveAccountType(widgetId: Int?, accountType: Int) {
+        sharedPreferences
+                .edit()
+                .putInt(KEY_ACCOUNT_TYPE + widgetId, accountType)
+                .apply()
+    }
+
+    fun getAccountType(widgetId: Int): Int {
+        return sharedPreferences.getInt(KEY_ACCOUNT_TYPE + widgetId, 0)
+    }
+
+    fun removeAccountType(widgetId: Int) {
+        return sharedPreferences
+                .edit()
+                .remove(KEY_ACCOUNT_TYPE + widgetId)
+                .apply()
+    }
 
     fun saveToken(token: Token) {
         sharedPreferences

@@ -16,13 +16,24 @@ import com.emmaguy.monzo.widget.R
 import com.emmaguy.monzo.widget.api.model.Balance
 import com.emmaguy.monzo.widget.common.TypefaceSpan
 import com.emmaguy.monzo.widget.common.toPx
+import com.emmaguy.monzo.widget.settings.SettingsPresenter
 import java.math.BigDecimal
 import java.util.*
+import android.app.PendingIntent
+import android.content.Intent
+import com.emmaguy.monzo.widget.settings.SettingsActivity
 
 
 class BalanceWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        updateWidgets(context, appWidgetIds, appWidgetManager)
+        updateAllWidgets(context)
+    }
+
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        val userStorage = MonzoWidgetApp.get(context).storageModule.userStorage
+        for (widgetId in appWidgetIds) {
+            userStorage.removeAccountType(widgetId)
+        }
     }
 
     companion object {
@@ -34,55 +45,40 @@ class BalanceWidgetProvider : AppWidgetProvider() {
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
 
-            updateWidgets(context, allWidgetIds, appWidgetManager)
+            for (i in allWidgetIds) {
+                updateWidget(context, i, appWidgetManager)
+            }
         }
 
-        private fun updateWidgets(context: Context, appWidgetIds: IntArray, appWidgetManager: AppWidgetManager) {
+        fun updateWidget(context: Context, appWidgetId: Int, appWidgetManager: AppWidgetManager) {
             val userStorage = MonzoWidgetApp.get(context).storageModule.userStorage
-            val prepaidBalance = userStorage.prepaidBalance
-            val currentAccountBalance = userStorage.currentAccountBalance
+            val accountType = userStorage.getAccountType(appWidgetId)
+            val isCurrentAccount = accountType == SettingsPresenter.AccountType.CURRENT.ordinal
 
-            if (prepaidBalance == null && currentAccountBalance == null) {
-                return
-            }
+            val accountBalance = (if (isCurrentAccount)
+                userStorage.currentAccountBalance
+            else userStorage.prepaidBalance) ?: return
 
-            for (i in 0..appWidgetIds.size - 1) {
-                val (balanceObj, isCurrentAccount) = getBalance(currentAccountBalance, prepaidBalance, i)
-                val backgroundResource = if (isCurrentAccount) R.drawable.background_ca else R.drawable.background_prepaid
-                val textColour = ContextCompat.getColor(context, if (isCurrentAccount) R.color.monzo_dark else R.color.monzo_light)
+            val backgroundResource = if (isCurrentAccount) R.drawable.background_ca else R.drawable.background_prepaid
+            val textColour = ContextCompat.getColor(context, if (isCurrentAccount) R.color.monzo_dark else R.color.monzo_light)
 
-                val balance = BigDecimal(balanceObj.balance).scaleByPowerOfTen(-2).toBigInteger()
-                val currency = Currency.getInstance(balanceObj.currency).symbol
-                val spannableString = createSpannableForBalance(context, currency, balance.toString(), textColour)
+            val balance = BigDecimal(accountBalance.balance).scaleByPowerOfTen(-2).toBigInteger()
+            val currency = Currency.getInstance(accountBalance.currency).symbol
+            val spannableString = createSpannableForBalance(context, currency, balance.toString(), textColour)
 
-                val remoteViews = RemoteViews(context.packageName, R.layout.widget_balance)
-                remoteViews.setTextViewText(R.id.widgetAmountTextView, spannableString)
-                remoteViews.setInt(R.id.widgetBackgroundView, "setBackgroundResource", backgroundResource)
-                appWidgetManager.updateAppWidget(appWidgetIds[i], remoteViews)
-            }
+            // Create intent to open settings when widget is clicked
+            val intent = Intent(context, SettingsActivity::class.java)
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            val pendingIntent = PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+            val remoteViews = RemoteViews(context.packageName, R.layout.widget_balance)
+            remoteViews.setOnClickPendingIntent(R.id.root_layout, pendingIntent)
+            remoteViews.setTextViewText(R.id.widgetAmountTextView, spannableString)
+            remoteViews.setInt(R.id.widgetBackgroundView, "setBackgroundResource", backgroundResource)
+            appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
         }
 
-        private fun getBalance(currentAccountBalance: Balance?, prepaidBalance: Balance?, i: Int): Pair<Balance, Boolean> {
-            val balanceObj: Balance
-            val isCurrentAccount: Boolean
-            if (currentAccountBalance == null) {
-                // We already checked that both are not null, so if CA is, prepaid must not be
-                balanceObj = prepaidBalance!!
-                isCurrentAccount = false
-            } else if (prepaidBalance == null) {
-                balanceObj = currentAccountBalance
-                isCurrentAccount = true
-            } else {
-                if (i % 2 == 0) {
-                    balanceObj = prepaidBalance
-                    isCurrentAccount = false
-                } else {
-                    balanceObj = currentAccountBalance
-                    isCurrentAccount = true
-                }
-            }
-            return Pair(balanceObj, isCurrentAccount)
-        }
+
 
         private fun createSpannableForBalance(context: Context, currency: String, balance: String, textColour: Int): SpannableString {
             // Some supremely crude scaling as balance gets larger
