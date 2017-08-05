@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity
 import com.emmaguy.monzo.widget.MonzoWidgetApp
 import com.emmaguy.monzo.widget.R
 import com.jakewharton.rxbinding2.view.clicks
-import com.jakewharton.rxbinding2.view.enabled
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_settings.*
 

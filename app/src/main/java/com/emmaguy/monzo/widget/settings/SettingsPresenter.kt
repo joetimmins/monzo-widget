@@ -8,6 +8,7 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import com.emmaguy.monzo.widget.balance.BalanceWidgetProvider
 import android.content.Intent
+import com.emmaguy.monzo.widget.api.model.AccountType
 
 
 class SettingsPresenter(
@@ -38,7 +39,7 @@ class SettingsPresenter(
     }
 
     private fun currentAccountClick(onCurrentAccountClicked: Observable<Unit>): Disposable {
-        return onCurrentAccountClicked.subscribe({ accountTypeButtonClick(AccountType.CURRENT) })
+        return onCurrentAccountClicked.subscribe({ accountTypeButtonClick(AccountType.CURRENT_ACCOUNT) })
     }
 
     private fun accountTypeButtonClick(accountType: AccountType) {
@@ -66,10 +67,5 @@ class SettingsPresenter(
         fun showCurrentAccountButton(enabled: Boolean)
         fun showPrepaidAccountButton(enabled: Boolean)
         fun getSettingsIntent(): Intent
-    }
-
-    enum class AccountType {
-        PREPAID,
-        CURRENT
     }
 }

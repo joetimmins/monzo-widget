@@ -13,14 +13,13 @@ import android.text.style.ForegroundColorSpan
 import android.widget.RemoteViews
 import com.emmaguy.monzo.widget.MonzoWidgetApp
 import com.emmaguy.monzo.widget.R
-import com.emmaguy.monzo.widget.api.model.Balance
 import com.emmaguy.monzo.widget.common.TypefaceSpan
 import com.emmaguy.monzo.widget.common.toPx
-import com.emmaguy.monzo.widget.settings.SettingsPresenter
 import java.math.BigDecimal
 import java.util.*
 import android.app.PendingIntent
 import android.content.Intent
+import com.emmaguy.monzo.widget.api.model.AccountType
 import com.emmaguy.monzo.widget.settings.SettingsActivity
 
 
@@ -53,7 +52,7 @@ class BalanceWidgetProvider : AppWidgetProvider() {
         fun updateWidget(context: Context, appWidgetId: Int, appWidgetManager: AppWidgetManager) {
             val userStorage = MonzoWidgetApp.get(context).storageModule.userStorage
             val accountType = userStorage.getAccountType(appWidgetId)
-            val isCurrentAccount = accountType == SettingsPresenter.AccountType.CURRENT.ordinal
+            val isCurrentAccount = accountType == AccountType.CURRENT_ACCOUNT.ordinal
 
             val accountBalance = (if (isCurrentAccount)
                 userStorage.currentAccountBalance
