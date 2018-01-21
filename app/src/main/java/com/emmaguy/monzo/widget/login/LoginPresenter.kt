@@ -30,7 +30,7 @@ class LoginPresenter(
             view.startBackgroundRefresh()
         }
 
-        disposables += view.onLoginClicked()
+        disposables += view.loginClicks()
                 .subscribe {
                     userStorage.state = UUID.randomUUID().toString()
 
@@ -42,36 +42,38 @@ class LoginPresenter(
                             "&state=" + userStorage.state)
                 }
 
-        disposables += view.onAuthCodeReceived()
+        disposables += view.authCodeChanges()
                 .doOnNext { view.showLoading() }
                 .doOnNext { view.showLoggingIn() }
                 .flatMapMaybe { (code, state) ->
-                    if (state == userStorage.state) {
-                        monzoApi.requestAccessToken(clientId, clientSecret, redirectUri, code)
-                                .doOnSuccess { token -> userStorage.saveToken(token) }
-                                .flatMap { monzoApi.accounts(AccountType.PREPAID.value) }
-                                .doOnSuccess { (accounts) ->
-                                    if (accounts.isNotEmpty()) {
-                                        userStorage.prepaidAccountId = accounts.first().id
+                    when (state) {
+                        userStorage.state -> {
+                            monzoApi.requestAccessToken(clientId, clientSecret, redirectUri, code)
+                                    .doOnSuccess { token -> userStorage.saveToken(token) }
+                                    .flatMap { monzoApi.accounts() }
+                                    .map { it.accounts }
+                                    .subscribeOn(ioScheduler)
+                                    .observeOn(uiScheduler)
+                                    .doOnError {
+                                        view.showLogIn()
+                                        userStorage.state = null
                                     }
-                                }
-                                .flatMap { monzoApi.accounts(AccountType.CURRENT_ACCOUNT.value) }
-                                .doOnSuccess { (accounts) ->
-                                    if (accounts.isNotEmpty()) {
-                                        userStorage.currentAccountId = accounts.first().id
-                                    }
-                                }
-                                .doOnError {
-                                    view.showLogIn()
-                                    userStorage.state = null
-                                }
-                                .toMaybe()
-                                .onErrorResumeNext(Maybe.empty())
-                                .subscribeOn(ioScheduler)
-                    } else {
-                        view.showLogIn()
-                        userStorage.state = null
-                        Maybe.empty()
+                                    .toMaybe()
+                                    .onErrorResumeNext(Maybe.empty())
+                        }
+                        else -> {
+                            view.showLogIn()
+                            userStorage.state = null
+                            Maybe.empty()
+                        }
+                    }
+                }
+                .doOnNext {
+                    for (account in it) {
+                        when {
+                            account.type == AccountType.PREPAID -> userStorage.prepaidAccountId = account.id
+                            account.type == AccountType.CURRENT_ACCOUNT -> userStorage.currentAccountId = account.id
+                        }
                     }
                 }
                 .observeOn(uiScheduler)
@@ -79,12 +81,12 @@ class LoginPresenter(
                 .subscribe({
                     view.showLoggedIn()
                     view.startBackgroundRefresh()
-                }, { error -> Timber.e(error) })
+                }, Timber::e)
     }
 
     interface View : BasePresenter.View {
-        fun onLoginClicked(): Observable<Unit>
-        fun onAuthCodeReceived(): Observable<Pair<String, String>>
+        fun loginClicks(): Observable<Unit>
+        fun authCodeChanges(): Observable<Pair<String, String>>
 
         fun showLoading()
         fun hideLoading()

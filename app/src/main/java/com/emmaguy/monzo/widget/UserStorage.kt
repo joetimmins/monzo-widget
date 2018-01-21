@@ -2,9 +2,9 @@ package com.emmaguy.monzo.widget
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.emmaguy.monzo.widget.api.model.AccountType
 import com.emmaguy.monzo.widget.api.model.Balance
 import com.emmaguy.monzo.widget.api.model.Token
-import com.emmaguy.monzo.widget.settings.SettingsPresenter
 
 class UserStorage(context: Context) {
     private val KEY_REFRESH_TOKEN = "KEY_REFRESH_TOKEN"
@@ -76,15 +76,19 @@ class UserStorage(context: Context) {
             sharedPreferences.edit().putString(KEY_CURRENT_ACCOUNT_ID, id).apply()
         }
 
-    fun saveAccountType(widgetId: Int?, accountType: Int) {
+    fun saveAccountType(widgetId: Int, accountType: AccountType) {
         sharedPreferences
                 .edit()
-                .putInt(KEY_ACCOUNT_TYPE + widgetId, accountType)
+                .putString(KEY_ACCOUNT_TYPE + widgetId, accountType.key)
                 .apply()
     }
 
-    fun getAccountType(widgetId: Int): Int {
-        return sharedPreferences.getInt(KEY_ACCOUNT_TYPE + widgetId, 0)
+    /**
+     * The account type for the given widget. Defaults to current account
+     */
+    fun accountType(widgetId: Int): AccountType {
+        val savedAccountType = sharedPreferences.getString(KEY_ACCOUNT_TYPE + widgetId, null)
+        return AccountType.find(savedAccountType) ?: AccountType.CURRENT_ACCOUNT
     }
 
     fun removeAccountType(widgetId: Int) {

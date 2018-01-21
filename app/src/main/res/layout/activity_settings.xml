@@ -4,38 +4,39 @@
                                              xmlns:tools="http://schemas.android.com/tools"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent"
-                                             tools:context="com.emmaguy.monzo.widget.login.LoginActivity">
+                                             tools:context="com.emmaguy.monzo.widget.settings.SettingsActivity">
 
-    <Button
-        android:id="@+id/ppButton"
-        android:layout_width="157dp"
-        android:layout_height="wrap_content"
-        android:text="Pre-Paid Account"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintHorizontal_bias="0.502"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline" />
+    <TextView android:id="@+id/settingsTitleTextView"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:fontFamily="sans-serif-medium"
+              android:gravity="center"
+              android:text="@string/settings_title_choose_type"
+              android:textSize="16sp"
+              app:layout_constraintBottom_toTopOf="@+id/prepaidButton"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintTop_toTopOf="parent"
+              app:layout_constraintVertical_chainStyle="packed"/>
 
-    <Button
-        android:id="@+id/cButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Current Account"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="8dp"
-        app:layout_constraintTop_toTopOf="@+id/guideline"
-        android:layout_marginTop="8dp" />
+    <Button android:id="@+id/prepaidButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/settings_title_prepaid_account"
+            app:layout_constraintBottom_toTopOf="@+id/currentAccountButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/settingsTitleTextView"/>
 
-    <android.support.constraint.Guideline
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintGuide_percent="0.5"
-        android:orientation="horizontal"
-        android:id="@+id/guideline" />
+    <Button android:id="@+id/currentAccountButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/settings_title_current_account"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/prepaidButton"/>
 
 </android.support.constraint.ConstraintLayout>

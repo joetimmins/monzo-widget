@@ -39,7 +39,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".balance.BalanceWidgetProvider">
+        <receiver android:name=".BalanceWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>

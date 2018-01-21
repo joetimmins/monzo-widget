@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import com.emmaguy.monzo.widget.BalanceWidgetProvider
 import com.emmaguy.monzo.widget.MonzoWidgetApp
 import com.emmaguy.monzo.widget.R
 import com.jakewharton.rxbinding2.view.clicks
@@ -13,14 +14,17 @@ import kotlinx.android.synthetic.main.activity_settings.*
 
 
 class SettingsActivity : AppCompatActivity(), SettingsPresenter.View {
-
-    private val presenter by lazy { MonzoWidgetApp.get(this).settingsModule.provideSettingsPresenter() }
+    private val presenter by lazy {
+        MonzoWidgetApp.get(this).settingsModule.provideSettingsPresenter(widgetId)
+    }
+    private val widgetId by lazy {
+        intent.extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_settings)
-
         setResult(RESULT_CANCELED)
 
         presenter.attachView(this)
@@ -31,40 +35,17 @@ class SettingsActivity : AppCompatActivity(), SettingsPresenter.View {
         super.onDestroy()
     }
 
-    override fun finishSuccess() {
-        val extras = intent.extras
-        if (extras != null) {
-            val widgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
-            if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                setResult(Activity.RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId))
-                finish()
-            }
-        }
+    override fun currentAccountClicks(): Observable<Unit> {
+        return currentAccountButton.clicks()
     }
 
-    override fun finishActivity() {
+    override fun prepaidClicks(): Observable<Unit> {
+        return prepaidButton.clicks()
+    }
+
+    override fun finish(appWidgetId: Int) {
+        setResult(Activity.RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId))
         finish()
+        BalanceWidgetProvider.updateWidget(this, appWidgetId)
     }
-
-    override fun getSettingsIntent(): Intent {
-        return intent
-    }
-
-    override fun onCurrentAccountClicked(): Observable<Unit> {
-        return cButton.clicks()
-    }
-
-    override fun onPrepaidAccountClicked(): Observable<Unit> {
-        return ppButton.clicks()
-    }
-
-    override fun showCurrentAccountButton(enabled: Boolean) {
-        cButton.isEnabled = enabled
-    }
-
-    override fun showPrepaidAccountButton(enabled: Boolean) {
-        ppButton.isEnabled = enabled
-    }
-
 }
-

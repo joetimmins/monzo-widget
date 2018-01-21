@@ -23,9 +23,7 @@ class BalanceManagerTest {
     @Mock private lateinit var monzoApi: MonzoApi
     @Mock private lateinit var userStorage: UserStorage
 
-
-    @Before
-    fun setUp() {
+    @Before fun setUp() {
         initMocks(this)
 
         whenMock(userStorage.prepaidAccountId).thenReturn(DEFAULT_PREPAID_ID)
@@ -37,9 +35,7 @@ class BalanceManagerTest {
         balanceManager = BalanceManager(monzoApi, userStorage)
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun refreshBalances_noErrors() {
+    @Test fun refreshBalances_noErrors() {
         balanceManager
                 .refreshBalances()
                 .test()
@@ -47,9 +43,7 @@ class BalanceManagerTest {
                 .assertComplete()
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun refreshBalances_noPrepaidAccount_noErrors() {
+    @Test fun refreshBalances_noPrepaidAccount_noErrors() {
         whenMock(userStorage.prepaidAccountId).thenReturn(null)
 
         balanceManager
@@ -59,9 +53,7 @@ class BalanceManagerTest {
                 .assertComplete()
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun refreshBalances_noCurrentAccount_noErrors() {
+    @Test fun refreshBalances_noCurrentAccount_noErrors() {
         whenMock(userStorage.currentAccountId).thenReturn(null)
 
         balanceManager
@@ -71,9 +63,7 @@ class BalanceManagerTest {
                 .assertComplete()
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun refreshBalances_savesPrepaidBalance() {
+    @Test fun refreshBalances_savesPrepaidBalance() {
         balanceManager
                 .refreshBalances()
                 .test()
@@ -83,9 +73,7 @@ class BalanceManagerTest {
         verify(userStorage).prepaidBalance = BALANCE_PREPAID
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun refreshBalances_savesCurrentAccountBalance() {
+    @Test fun refreshBalances_savesCurrentAccountBalance() {
         balanceManager
                 .refreshBalances()
                 .test()

@@ -28,7 +28,7 @@ interface MonzoApi {
     ): Call<Token>
 
     @GET("accounts")
-    fun accounts(@Query("account_type") type: String): Single<AccountsResponse>
+    fun accounts(): Single<AccountsResponse>
 
     @GET("balance")
     fun balance(@Query("account_id") accountId: String): Single<Balance>

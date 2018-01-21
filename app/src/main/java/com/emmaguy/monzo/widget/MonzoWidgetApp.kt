@@ -20,7 +20,7 @@ class MonzoWidgetApp : Application() {
         storageModule = StorageModule(this)
         apiModule = ApiModule(this, storageModule)
         loginModule = LoginModule(this, storageModule, apiModule)
-        settingsModule = SettingsModule(this, storageModule)
+        settingsModule = SettingsModule(storageModule)
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())

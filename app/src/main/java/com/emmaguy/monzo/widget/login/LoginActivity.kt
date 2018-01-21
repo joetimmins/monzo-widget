@@ -50,17 +50,16 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.View {
         super.onDestroy()
     }
 
-    override fun onLoginClicked(): Observable<Unit> {
+    override fun loginClicks(): Observable<Unit> {
         return loginButton.clicks()
     }
 
-    override fun onAuthCodeReceived(): Observable<Pair<String, String>> {
+    override fun authCodeChanges(): Observable<Pair<String, String>> {
         return authCodeChangedRelay
     }
 
     override fun showLogIn() {
         loginButton.visible()
-        instructionsTextView.text = getString(R.string.login_follow_steps_body)
     }
 
     override fun hideLoginButton() {

@@ -6,9 +6,12 @@
     <!-- App strings -->
     <string name="app_name">monzo widget</string>
     <string name="login_action_title">Login</string>
-    <string name="login_follow_steps_body">Follow the steps to login</string>
     <string name="login_redirecting_body">Redirecting to browser - please follow the instructions to send a
-        magic link email, then click on "Login to Monzo"</string>
+        magic link email, then click on \'Login to Monzo\'
+    </string>
     <string name="login_logging_in_body">Logging you in…</string>
     <string name="login_logged_in_body">Successfully logged in.\n\nDrag a widget to your homescreen and enjoy!</string>
+    <string name="settings_title_prepaid_account">Prepaid Account</string>
+    <string name="settings_title_current_account">Current account</string>
+    <string name="settings_title_choose_type">Choose your account type:</string>
 </resources>

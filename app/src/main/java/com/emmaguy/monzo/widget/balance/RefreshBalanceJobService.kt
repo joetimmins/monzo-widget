@@ -4,6 +4,7 @@ package com.emmaguy.monzo.widget.balance
 import android.app.job.JobParameters
 import android.app.job.JobService
 import com.emmaguy.monzo.widget.AppModule
+import com.emmaguy.monzo.widget.BalanceWidgetProvider
 import com.emmaguy.monzo.widget.MonzoWidgetApp
 import io.reactivex.disposables.Disposable
 import timber.log.Timber

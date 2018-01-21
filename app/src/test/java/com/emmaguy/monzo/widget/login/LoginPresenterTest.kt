@@ -14,7 +14,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations.initMocks
-import org.mockito.Mockito.`when` as whenMock
+import org.mockito.Mockito.`when` as whenever
 
 class LoginPresenterTest {
     private val CLIENT_ID = "CLIENT_ID"
@@ -25,6 +25,8 @@ class LoginPresenterTest {
     private val DEFAULT_STATE = "DEFAULT_STATE"
 
     private val defaultToken = Token("access_token", "refresh_token", "type")
+    private val prepaid = Account("pp_id", AccountType.PREPAID)
+    private val currentAccount = Account("ca_id", AccountType.CURRENT_ACCOUNT)
 
     private val loginRelay = PublishRelay.create<Unit>()
     private val authCodeRelay = PublishRelay.create<Pair<String, String>>()
@@ -35,46 +37,39 @@ class LoginPresenterTest {
     private lateinit var presenter: LoginPresenter
     @Mock private lateinit var view: LoginPresenter.View
 
-    @Before
-    fun setUp() {
+    @Before fun setUp() {
         initMocks(this)
 
-        whenMock(view.onLoginClicked()).thenReturn(loginRelay)
-        whenMock(view.onAuthCodeReceived()).thenReturn(authCodeRelay)
+        whenever(view.loginClicks()).thenReturn(loginRelay)
+        whenever(view.authCodeChanges()).thenReturn(authCodeRelay)
 
-        whenMock(userStorage.state).thenReturn(DEFAULT_STATE)
+        whenever(userStorage.state).thenReturn(DEFAULT_STATE)
 
-        whenMock(monzoApi.requestAccessToken(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, DEFAULT_CODE)).thenReturn(Single.just(defaultToken))
-        whenMock(monzoApi.accounts(AccountType.PREPAID.value)).thenReturn(Single.just(AccountsResponse(listOf(Account("prepaid_id")))))
-        whenMock(monzoApi.accounts(AccountType.CURRENT_ACCOUNT.value)).thenReturn(Single.just(AccountsResponse(listOf(Account("ca_id")))))
+        whenever(monzoApi.accounts()).thenReturn(Single.just(AccountsResponse(listOf(prepaid, currentAccount))))
+        whenever(monzoApi.requestAccessToken(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, DEFAULT_CODE))
+                .thenReturn(Single.just(defaultToken))
 
         presenter = LoginPresenter(monzoApi, Schedulers.trampoline(), Schedulers.trampoline(), CLIENT_ID, CLIENT_SECRET,
                 REDIRECT_URI, userStorage)
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun attachView_hasToken_showLoggedIn() {
-        whenMock(userStorage.hasToken()).thenReturn(true)
+    @Test fun attachView_hasToken_showLoggedIn() {
+        whenever(userStorage.hasToken()).thenReturn(true)
 
         presenter.attachView(view)
 
         verify(view).showLoggedIn()
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun attachView_hasToken_startBackgroundRefresh() {
-        whenMock(userStorage.hasToken()).thenReturn(true)
+    @Test fun attachView_hasToken_startBackgroundRefresh() {
+        whenever(userStorage.hasToken()).thenReturn(true)
 
         presenter.attachView(view)
 
         verify(view).startBackgroundRefresh()
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun onLoginClicked_showRedirecting() {
+    @Test fun onLoginClicked_showRedirecting() {
         presenter.attachView(view)
 
         loginRelay.accept(Unit)
@@ -82,9 +77,7 @@ class LoginPresenterTest {
         verify(view).showRedirecting()
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun onLoginClicked_hideLoginButton() {
+    @Test fun onLoginClicked_hideLoginButton() {
         presenter.attachView(view)
 
         loginRelay.accept(Unit)
@@ -92,9 +85,7 @@ class LoginPresenterTest {
         verify(view).hideLoginButton()
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun onLoginClicked_startLogin() {
+    @Test fun onLoginClicked_startLogin() {
         presenter.attachView(view)
 
         loginRelay.accept(Unit)
@@ -102,9 +93,7 @@ class LoginPresenterTest {
         verify(view).startLogin(anyString())
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun onAuthCodeReceived_showLoading() {
+    @Test fun onAuthCodeReceived_showLoading() {
         presenter.attachView(view)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
@@ -112,9 +101,7 @@ class LoginPresenterTest {
         verify(view).showLoading()
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun onAuthCodeReceived_showLoggingIn() {
+    @Test fun onAuthCodeReceived_showLoggingIn() {
         presenter.attachView(view)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
@@ -122,9 +109,7 @@ class LoginPresenterTest {
         verify(view).showLoggingIn()
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun onAuthCodeReceived_requestAccessToken() {
+    @Test fun onAuthCodeReceived_requestAccessToken() {
         presenter.attachView(view)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
@@ -132,19 +117,15 @@ class LoginPresenterTest {
         verify(monzoApi).requestAccessToken(anyString(), anyString(), anyString(), anyString(), anyString())
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun onAuthCodeReceived_saveToken() {
+    @Test fun onAuthCodeReceived_saveToken() {
         presenter.attachView(view)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
 
-        verify(userStorage).saveToken(defaultToken) }
+        verify(userStorage).saveToken(defaultToken)
+    }
 
-
-    @Test
-    @Throws(Exception::class)
-    fun onAuthCodeReceived_showLoggedIn() {
+    @Test fun onAuthCodeReceived_showLoggedIn() {
         presenter.attachView(view)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
@@ -152,9 +133,7 @@ class LoginPresenterTest {
         verify(view).showLoggedIn()
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun onAuthCodeReceived_differentState_dontRequestAccessToken() {
+    @Test fun onAuthCodeReceived_differentState_dontRequestAccessToken() {
         presenter.attachView(view)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, "differentState"))
@@ -162,9 +141,7 @@ class LoginPresenterTest {
         verify(monzoApi, never()).requestAccessToken(anyString(), anyString(), anyString(), anyString(), anyString())
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun onAuthCodeReceived_differentState_showLogIn() {
+    @Test fun onAuthCodeReceived_differentState_showLogIn() {
         presenter.attachView(view)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, "differentState"))
@@ -172,9 +149,7 @@ class LoginPresenterTest {
         verify(view).showLogIn()
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun onAuthCodeReceived_differentStateThenCorrectState_showLoggedIn() {
+    @Test fun onAuthCodeReceived_differentStateThenCorrectState_showLoggedIn() {
         presenter.attachView(view)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, "differentState"))
@@ -183,10 +158,8 @@ class LoginPresenterTest {
         verify(view).showLoggedIn()
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun onAuthCodeReceived_noCurrentAccount_showLoggedIn() {
-        whenMock(monzoApi.accounts(AccountType.CURRENT_ACCOUNT.value)).thenReturn(Single.just(AccountsResponse(listOf())))
+    @Test fun onAuthCodeReceived_noCurrentAccount_showLoggedIn() {
+        whenever(monzoApi.accounts()).thenReturn(Single.just(AccountsResponse(listOf(prepaid))))
         presenter.attachView(view)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
@@ -194,10 +167,8 @@ class LoginPresenterTest {
         verify(view).showLoggedIn()
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun onAuthCodeReceived_noPrepaidAccount_showLoggedIn() {
-        whenMock(monzoApi.accounts(AccountType.PREPAID.value)).thenReturn(Single.just(AccountsResponse(listOf())))
+    @Test fun onAuthCodeReceived_noPrepaidAccount_showLoggedIn() {
+        whenever(monzoApi.accounts()).thenReturn(Single.just(AccountsResponse(listOf(currentAccount))))
         presenter.attachView(view)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
