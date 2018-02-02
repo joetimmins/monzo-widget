@@ -3,6 +3,7 @@ package com.emmaguy.monzo.widget.api
 import android.content.Context
 import com.emmaguy.monzo.widget.BuildConfig
 import com.emmaguy.monzo.widget.StorageModule
+import com.emmaguy.monzo.widget.api.model.Token
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.readystatesoftware.chuck.ChuckInterceptor
 import com.squareup.moshi.Moshi
@@ -50,11 +51,14 @@ class ApiModule(
                             val tokenResponse = call.execute()
                             if (tokenResponse.code() == 200) {
                                 val newToken = tokenResponse.body()
-                                userStorage.saveToken(newToken)
+                                newToken?.let { token: Token ->
+                                    userStorage.saveToken(token)
+                                    response.request().newBuilder()
+                                            .header("Authorization", token.tokenType + " " + token.accessToken)
+                                            .build()
+                                }
 
-                                response.request().newBuilder()
-                                        .header("Authorization", newToken.tokenType + " " + newToken.accessToken)
-                                        .build()
+
                             }
                         } catch (e: IOException) {
                             Timber.e(e, "Exception whilst trying to refresh token")
