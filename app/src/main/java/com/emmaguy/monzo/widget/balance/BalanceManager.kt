@@ -29,7 +29,7 @@ class BalanceManager(
 
     private fun requestTransactionsForAccount(accountType: AccountType): Completable {
         return accountIdFor(accountType)?.let { accountId ->
-            monzoApi.transactions(accountId).toCompletable(
+            monzoApi.transactions(accountId).toCompletable()
         } ?: Completable.complete()
     }
 
