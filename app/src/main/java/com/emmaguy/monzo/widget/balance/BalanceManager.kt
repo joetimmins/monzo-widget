@@ -18,20 +18,25 @@ class BalanceManager(
     }
 
     private fun requestBalanceForAccount(accountType: AccountType, balanceWriter: (Balance?) -> Unit): Completable {
-        return accountIdFor(accountType)?.let { accountId ->
+        val apiCall: (String) -> Completable = { accountId ->
             monzoApi.balance(accountId)
                     .doOnSuccess { balance: Balance? ->
                         balanceWriter.invoke(balance)
                     }
                     .toCompletable()
-        } ?: Completable.complete()
+        }
+        return apiCallAsCompletable(accountType, apiCall)
     }
 
     private fun requestTransactionsForAccount(accountType: AccountType): Completable {
-        return accountIdFor(accountType)?.let { accountId ->
+        val apiCall: (String) -> Completable = { accountId ->
             monzoApi.transactions(accountId).toCompletable()
-        } ?: Completable.complete()
+        }
+        return apiCallAsCompletable(accountType, apiCall)
     }
+
+    private fun apiCallAsCompletable(accountType: AccountType, apiCall: (String) -> Completable) =
+            accountIdFor(accountType)?.let(apiCall) ?: Completable.complete()
 
     private fun accountIdFor(type: AccountType): String? =
             if (type == AccountType.PREPAID) userStorage.prepaidAccountId else userStorage.currentAccountId
