@@ -13,6 +13,8 @@ class BalanceManager(
     fun refreshBalances(): Completable {
         return Completable.defer { requestBalanceForAccount(AccountType.PREPAID, { userStorage.prepaidBalance = it }) }
                 .andThen(requestBalanceForAccount(AccountType.CURRENT_ACCOUNT, { userStorage.currentAccountBalance = it }))
+                .andThen(requestTransactionsForAccount(AccountType.PREPAID))
+                .andThen(requestTransactionsForAccount(AccountType.CURRENT_ACCOUNT))
     }
 
     private fun requestBalanceForAccount(accountType: AccountType, balanceWriter: (Balance?) -> Unit): Completable {
@@ -22,6 +24,12 @@ class BalanceManager(
                         balanceWriter.invoke(balance)
                     }
                     .toCompletable()
+        } ?: Completable.complete()
+    }
+
+    private fun requestTransactionsForAccount(accountType: AccountType): Completable {
+        return accountIdFor(accountType)?.let { accountId ->
+            monzoApi.transactions(accountId).toCompletable(
         } ?: Completable.complete()
     }
 
