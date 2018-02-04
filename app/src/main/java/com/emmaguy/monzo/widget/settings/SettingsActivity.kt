@@ -31,7 +31,11 @@ class SettingsActivity : AppCompatActivity(), SettingsPresenter.View {
     }
 
     override fun onDestroy() {
-        presenter.detachView()
+        if (presenter.view == null) {
+            throw IllegalStateException("View has already been detached")
+        }
+        presenter.view = null
+        presenter.disposables.clear()
         super.onDestroy()
     }
 

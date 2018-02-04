@@ -14,7 +14,10 @@ class SettingsPresenter(
 ) : BasePresenter<SettingsPresenter.View>() {
 
     override fun attachView(view: View) {
-        super.attachView(view)
+        if (super.view !== null) {
+            throw IllegalStateException("View " + super.view + " has already been attached")
+        }
+        super.view = view
 
         disposables += view.currentAccountClicks()
                 .doOnNext { userStorage.saveAccountType(appWidgetId, AccountType.CURRENT_ACCOUNT) }
