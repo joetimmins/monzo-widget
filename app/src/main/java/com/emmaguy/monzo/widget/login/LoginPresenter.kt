@@ -8,6 +8,7 @@ import com.emmaguy.monzo.widget.common.plus
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Scheduler
+import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 import java.util.*
 
@@ -20,34 +21,37 @@ class LoginPresenter(
         private val clientSecret: String,
         private val redirectUri: String,
         private val userStorage: UserStorage
-) : BasePresenter<LoginPresenter.View>() {
+) : BasePresenter<LoginPresenter.LoginView>() {
 
-    override fun attachView(view: View) {
-        if (super.view !== null) {
-            throw IllegalStateException("View " + super.view + " has already been attached")
+    private var disposables: CompositeDisposable = CompositeDisposable()
+    private var view: BasePresenter.View? = null
+
+    fun attachView(loginView: LoginView) {
+        if (view !== null) {
+            throw IllegalStateException("View $view has already been attached")
         }
-        super.view = view
+        view = loginView
 
         if (userStorage.hasToken()) {
-            view.showLoggedIn()
-            view.startBackgroundRefresh()
+            loginView.showLoggedIn()
+            loginView.startBackgroundRefresh()
         }
 
-        disposables += view.loginClicks()
+        disposables = disposables.plus(loginView.loginClicks()
                 .subscribe {
                     userStorage.state = UUID.randomUUID().toString()
 
-                    view.showRedirecting()
-                    view.hideLoginButton()
-                    view.startLogin("https://auth.monzo.com/?client_id=$clientId" +
+                    loginView.showRedirecting()
+                    loginView.hideLoginButton()
+                    loginView.startLogin("https://auth.monzo.com/?client_id=$clientId" +
                             "&redirect_uri=$redirectUri" +
                             "&response_type=code" +
                             "&state=" + userStorage.state)
-                }
+                })
 
-        disposables += view.authCodeChanges()
-                .doOnNext { view.showLoading() }
-                .doOnNext { view.showLoggingIn() }
+        disposables = disposables.plus(loginView.authCodeChanges()
+                .doOnNext { loginView.showLoading() }
+                .doOnNext { loginView.showLoggingIn() }
                 .flatMapMaybe { (code, state) ->
                     when (state) {
                         userStorage.state -> {
@@ -58,14 +62,14 @@ class LoginPresenter(
                                     .subscribeOn(ioScheduler)
                                     .observeOn(uiScheduler)
                                     .doOnError {
-                                        view.showLogIn()
+                                        loginView.showLogIn()
                                         userStorage.state = null
                                     }
                                     .toMaybe()
                                     .onErrorResumeNext(Maybe.empty())
                         }
                         else -> {
-                            view.showLogIn()
+                            loginView.showLogIn()
                             userStorage.state = null
                             Maybe.empty()
                         }
@@ -80,14 +84,22 @@ class LoginPresenter(
                     }
                 }
                 .observeOn(uiScheduler)
-                .doOnNext { view.hideLoading() }
+                .doOnNext { loginView.hideLoading() }
                 .subscribe({
-                    view.showLoggedIn()
-                    view.startBackgroundRefresh()
-                }, Timber::e)
+                    loginView.showLoggedIn()
+                    loginView.startBackgroundRefresh()
+                }, Timber::e))
     }
 
-    interface View : BasePresenter.View {
+    fun detachView() {
+        if (view == null) {
+            throw IllegalStateException("View has already been detached")
+        }
+        view = null
+        disposables.clear()
+    }
+
+    interface LoginView : BasePresenter.View {
         fun loginClicks(): Observable<Unit>
         fun authCodeChanges(): Observable<Pair<String, String>>
 

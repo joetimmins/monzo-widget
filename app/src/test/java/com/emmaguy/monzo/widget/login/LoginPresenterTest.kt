@@ -35,13 +35,13 @@ class LoginPresenterTest {
     @Mock private lateinit var userStorage: UserStorage
 
     private lateinit var presenter: LoginPresenter
-    @Mock private lateinit var view: LoginPresenter.View
+    @Mock private lateinit var loginView: LoginPresenter.LoginView
 
     @Before fun setUp() {
         initMocks(this)
 
-        whenever(view.loginClicks()).thenReturn(loginRelay)
-        whenever(view.authCodeChanges()).thenReturn(authCodeRelay)
+        whenever(loginView.loginClicks()).thenReturn(loginRelay)
+        whenever(loginView.authCodeChanges()).thenReturn(authCodeRelay)
 
         whenever(userStorage.state).thenReturn(DEFAULT_STATE)
 
@@ -56,61 +56,61 @@ class LoginPresenterTest {
     @Test fun attachView_hasToken_showLoggedIn() {
         whenever(userStorage.hasToken()).thenReturn(true)
 
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
-        verify(view).showLoggedIn()
+        verify(loginView).showLoggedIn()
     }
 
     @Test fun attachView_hasToken_startBackgroundRefresh() {
         whenever(userStorage.hasToken()).thenReturn(true)
 
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
-        verify(view).startBackgroundRefresh()
+        verify(loginView).startBackgroundRefresh()
     }
 
     @Test fun onLoginClicked_showRedirecting() {
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
         loginRelay.accept(Unit)
 
-        verify(view).showRedirecting()
+        verify(loginView).showRedirecting()
     }
 
     @Test fun onLoginClicked_hideLoginButton() {
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
         loginRelay.accept(Unit)
 
-        verify(view).hideLoginButton()
+        verify(loginView).hideLoginButton()
     }
 
     @Test fun onLoginClicked_startLogin() {
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
         loginRelay.accept(Unit)
 
-        verify(view).startLogin(anyString())
+        verify(loginView).startLogin(anyString())
     }
 
     @Test fun onAuthCodeReceived_showLoading() {
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
 
-        verify(view).showLoading()
+        verify(loginView).showLoading()
     }
 
     @Test fun onAuthCodeReceived_showLoggingIn() {
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
 
-        verify(view).showLoggingIn()
+        verify(loginView).showLoggingIn()
     }
 
     @Test fun onAuthCodeReceived_requestAccessToken() {
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
 
@@ -118,7 +118,7 @@ class LoginPresenterTest {
     }
 
     @Test fun onAuthCodeReceived_saveToken() {
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
 
@@ -126,15 +126,15 @@ class LoginPresenterTest {
     }
 
     @Test fun onAuthCodeReceived_showLoggedIn() {
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
 
-        verify(view).showLoggedIn()
+        verify(loginView).showLoggedIn()
     }
 
     @Test fun onAuthCodeReceived_differentState_dontRequestAccessToken() {
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, "differentState"))
 
@@ -142,37 +142,37 @@ class LoginPresenterTest {
     }
 
     @Test fun onAuthCodeReceived_differentState_showLogIn() {
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, "differentState"))
 
-        verify(view).showLogIn()
+        verify(loginView).showLogIn()
     }
 
     @Test fun onAuthCodeReceived_differentStateThenCorrectState_showLoggedIn() {
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, "differentState"))
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
 
-        verify(view).showLoggedIn()
+        verify(loginView).showLoggedIn()
     }
 
     @Test fun onAuthCodeReceived_noCurrentAccount_showLoggedIn() {
         whenever(monzoApi.accounts()).thenReturn(Single.just(AccountsResponse(listOf(prepaid))))
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
 
-        verify(view).showLoggedIn()
+        verify(loginView).showLoggedIn()
     }
 
     @Test fun onAuthCodeReceived_noPrepaidAccount_showLoggedIn() {
         whenever(monzoApi.accounts()).thenReturn(Single.just(AccountsResponse(listOf(currentAccount))))
-        presenter.attachView(view)
+        presenter.attachView(loginView)
 
         authCodeRelay.accept(Pair(DEFAULT_CODE, DEFAULT_STATE))
 
-        verify(view).showLoggedIn()
+        verify(loginView).showLoggedIn()
     }
 }

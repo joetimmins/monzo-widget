@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.activity_login.*
 import java.util.concurrent.TimeUnit
 
 
-class LoginActivity : AppCompatActivity(), LoginPresenter.View {
+class LoginActivity : AppCompatActivity(), LoginPresenter.LoginView {
     private val JOB_ID = 1
     private val authCodeChangedRelay = PublishRelay.create<Pair<String, String>>()
     private val presenter by lazy { MonzoWidgetApp.get(this).loginModule.provideLoginPresenter() }
@@ -45,12 +45,7 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.View {
     }
 
     override fun onDestroy() {
-        if (presenter.view == null) {
-            throw IllegalStateException("View has already been detached")
-        }
-        presenter.view = null
-        presenter.disposables.clear()
-
+        presenter.detachView()
         super.onDestroy()
     }
 
