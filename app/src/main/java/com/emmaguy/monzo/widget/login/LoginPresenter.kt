@@ -3,7 +3,6 @@ package com.emmaguy.monzo.widget.login
 import com.emmaguy.monzo.widget.UserStorage
 import com.emmaguy.monzo.widget.api.MonzoApi
 import com.emmaguy.monzo.widget.api.model.AccountType
-import com.emmaguy.monzo.widget.common.BasePresenter
 import com.emmaguy.monzo.widget.common.plus
 import io.reactivex.Maybe
 import io.reactivex.Observable
@@ -21,10 +20,9 @@ class LoginPresenter(
         private val clientSecret: String,
         private val redirectUri: String,
         private val userStorage: UserStorage
-) : BasePresenter<LoginPresenter.LoginView>() {
-
+) {
     private var disposables: CompositeDisposable = CompositeDisposable()
-    private var view: BasePresenter.View? = null
+    private var view: LoginView? = null
 
     fun attachView(loginView: LoginView) {
         if (view !== null) {
@@ -99,7 +97,7 @@ class LoginPresenter(
         disposables.clear()
     }
 
-    interface LoginView : BasePresenter.View {
+    interface LoginView {
         fun loginClicks(): Observable<Unit>
         fun authCodeChanges(): Observable<Pair<String, String>>
 

@@ -2,7 +2,6 @@ package com.emmaguy.monzo.widget.settings
 
 import com.emmaguy.monzo.widget.UserStorage
 import com.emmaguy.monzo.widget.api.model.AccountType
-import com.emmaguy.monzo.widget.common.BasePresenter
 import com.emmaguy.monzo.widget.common.plus
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -12,9 +11,9 @@ import timber.log.Timber
 class SettingsPresenter(
         private val appWidgetId: Int,
         private val userStorage: UserStorage
-) : BasePresenter<SettingsPresenter.SettingsView>() {
+) {
     private var disposables: CompositeDisposable = CompositeDisposable()
-    private var view: BasePresenter.View? = null
+    private var view: SettingsView? = null
 
     fun attachView(settingsView: SettingsView) {
         if (view !== null) {
@@ -39,7 +38,7 @@ class SettingsPresenter(
         disposables.clear()
     }
 
-    interface SettingsView : BasePresenter.View {
+    interface SettingsView {
         fun currentAccountClicks(): Observable<Unit>
         fun prepaidClicks(): Observable<Unit>
 
