@@ -13,7 +13,7 @@ import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_settings.*
 
 
-class SettingsActivity : AppCompatActivity(), SettingsPresenter.View {
+class SettingsActivity : AppCompatActivity(), SettingsPresenter.SettingsView {
     private val presenter by lazy {
         MonzoWidgetApp.get(this).settingsModule.provideSettingsPresenter(widgetId)
     }
@@ -31,11 +31,7 @@ class SettingsActivity : AppCompatActivity(), SettingsPresenter.View {
     }
 
     override fun onDestroy() {
-        if (presenter.view == null) {
-            throw IllegalStateException("View has already been detached")
-        }
-        presenter.view = null
-        presenter.disposables.clear()
+        presenter.detachView()
         super.onDestroy()
     }
 

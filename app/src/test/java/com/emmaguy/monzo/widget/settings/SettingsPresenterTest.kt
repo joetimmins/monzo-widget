@@ -18,19 +18,19 @@ class SettingsPresenterTest {
     @Mock private lateinit var userStorage: UserStorage
 
     private lateinit var presenter: SettingsPresenter
-    @Mock private lateinit var view: SettingsPresenter.View
+    @Mock private lateinit var settingsView: SettingsPresenter.SettingsView
 
     @Before fun setUp() {
         initMocks(this)
 
-        whenever(view.currentAccountClicks()).thenReturn(currentAccountRelay)
-        whenever(view.prepaidClicks()).thenReturn(prepaidRelay)
+        whenever(settingsView.currentAccountClicks()).thenReturn(currentAccountRelay)
+        whenever(settingsView.prepaidClicks()).thenReturn(prepaidRelay)
 
         presenter = SettingsPresenter(appWidgetId, userStorage)
     }
 
     @Test fun currentAccountClicks_saveCurrentAccount() {
-        presenter.attachView(view)
+        presenter.attachView(settingsView)
 
         currentAccountRelay.accept(Unit)
 
@@ -38,7 +38,7 @@ class SettingsPresenterTest {
     }
 
     @Test fun prepaidClicks_savePrepaid() {
-        presenter.attachView(view)
+        presenter.attachView(settingsView)
 
         prepaidRelay.accept(Unit)
 
@@ -46,18 +46,18 @@ class SettingsPresenterTest {
     }
 
     @Test fun currentAccountClicks_finishSuccess() {
-        presenter.attachView(view)
+        presenter.attachView(settingsView)
 
         currentAccountRelay.accept(Unit)
 
-        verify(view).finish(appWidgetId)
+        verify(settingsView).finish(appWidgetId)
     }
 
     @Test fun prepaidClicks_finishSuccess() {
-        presenter.attachView(view)
+        presenter.attachView(settingsView)
 
         prepaidRelay.accept(Unit)
 
-        verify(view).finish(appWidgetId)
+        verify(settingsView).finish(appWidgetId)
     }
 }

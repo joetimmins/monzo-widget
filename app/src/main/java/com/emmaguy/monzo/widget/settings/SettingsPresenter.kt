@@ -12,26 +12,34 @@ import timber.log.Timber
 class SettingsPresenter(
         private val appWidgetId: Int,
         private val userStorage: UserStorage
-) : BasePresenter<SettingsPresenter.View>() {
-
-    protected var disposables: CompositeDisposable = CompositeDisposable()
+) : BasePresenter<SettingsPresenter.SettingsView>() {
+    private var disposables: CompositeDisposable = CompositeDisposable()
     private var view: BasePresenter.View? = null
-    override fun attachView(view: View) {
-        if (super.view !== null) {
-            throw IllegalStateException("View " + super.view + " has already been attached")
+
+    fun attachView(settingsView: SettingsView) {
+        if (view !== null) {
+            throw IllegalStateException("View $view has already been attached")
         }
-        super.view = view
+        view = settingsView
 
-        disposables += view.currentAccountClicks()
+        disposables += settingsView.currentAccountClicks()
                 .doOnNext { userStorage.saveAccountType(appWidgetId, AccountType.CURRENT_ACCOUNT) }
-                .subscribe({ view.finish(appWidgetId) }, Timber::e)
+                .subscribe({ settingsView.finish(appWidgetId) }, Timber::e)
 
-        disposables += view.prepaidClicks()
+        disposables += settingsView.prepaidClicks()
                 .doOnNext { userStorage.saveAccountType(appWidgetId, AccountType.PREPAID) }
-                .subscribe({ view.finish(appWidgetId) }, Timber::e)
+                .subscribe({ settingsView.finish(appWidgetId) }, Timber::e)
     }
 
-    interface View : BasePresenter.View {
+    fun detachView() {
+        if (view == null) {
+            throw IllegalStateException("View has already been detached")
+        }
+        view = null
+        disposables.clear()
+    }
+
+    interface SettingsView : BasePresenter.View {
         fun currentAccountClicks(): Observable<Unit>
         fun prepaidClicks(): Observable<Unit>
 
