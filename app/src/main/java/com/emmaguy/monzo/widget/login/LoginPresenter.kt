@@ -3,7 +3,6 @@ package com.emmaguy.monzo.widget.login
 import com.emmaguy.monzo.widget.UserStorage
 import com.emmaguy.monzo.widget.api.MonzoApi
 import com.emmaguy.monzo.widget.api.model.AccountType
-import com.emmaguy.monzo.widget.common.plus
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Scheduler
@@ -21,7 +20,7 @@ class LoginPresenter(
         private val redirectUri: String,
         private val userStorage: UserStorage
 ) {
-    private var disposables: CompositeDisposable = CompositeDisposable()
+    private val disposables = CompositeDisposable()
     private var view: LoginView? = null
 
     fun attachView(loginView: LoginView) {
@@ -35,7 +34,7 @@ class LoginPresenter(
             loginView.startBackgroundRefresh()
         }
 
-        disposables = disposables.plus(loginView.loginClicks()
+        disposables.add(loginView.loginClicks()
                 .subscribe {
                     userStorage.state = UUID.randomUUID().toString()
 
@@ -47,7 +46,7 @@ class LoginPresenter(
                             "&state=" + userStorage.state)
                 })
 
-        disposables = disposables.plus(loginView.authCodeChanges()
+        disposables.add(loginView.authCodeChanges()
                 .doOnNext { loginView.showLoading() }
                 .doOnNext { loginView.showLoggingIn() }
                 .flatMapMaybe { (code, state) ->
