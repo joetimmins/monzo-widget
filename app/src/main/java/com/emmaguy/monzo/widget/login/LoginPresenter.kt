@@ -50,26 +50,23 @@ class LoginPresenter(
                 .doOnNext { loginView.showLoading() }
                 .doOnNext { loginView.showLoggingIn() }
                 .flatMapMaybe { (code, state) ->
-                    when (state) {
-                        userStorage.state -> {
-                            monzoApi.requestAccessToken(clientId, clientSecret, redirectUri, code)
-                                    .doOnSuccess { token -> userStorage.saveToken(token) }
-                                    .flatMap { monzoApi.accounts() }
-                                    .map { it.accounts }
-                                    .subscribeOn(ioScheduler)
-                                    .observeOn(uiScheduler)
-                                    .doOnError {
-                                        loginView.showLogIn()
-                                        userStorage.state = null
-                                    }
-                                    .toMaybe()
-                                    .onErrorResumeNext(Maybe.empty())
-                        }
-                        else -> {
-                            loginView.showLogIn()
-                            userStorage.state = null
-                            Maybe.empty()
-                        }
+                    if (state == userStorage.state) {
+                        monzoApi.requestAccessToken(clientId, clientSecret, redirectUri, code)
+                                .doOnSuccess { token -> userStorage.saveToken(token) }
+                                .flatMap { monzoApi.accounts() }
+                                .map { it.accounts }
+                                .subscribeOn(ioScheduler)
+                                .observeOn(uiScheduler)
+                                .doOnError {
+                                    loginView.showLogIn()
+                                    userStorage.state = null
+                                }
+                                .toMaybe()
+                                .onErrorResumeNext(Maybe.empty())
+                    } else {
+                        loginView.showLogIn()
+                        userStorage.state = null
+                        Maybe.empty()
                     }
                 }
                 .doOnNext {
