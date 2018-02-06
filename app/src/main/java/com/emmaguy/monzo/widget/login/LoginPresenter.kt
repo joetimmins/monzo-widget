@@ -31,8 +31,7 @@ class LoginPresenter(
         view = loginView
 
         if (userStorage.hasToken() && userStorage.hasMonzoMeLink()) {
-//            loginView.showLoggedIn()
-            loginView.showMonzoMeInput()
+            loginView.showLoggedIn()
             loginView.startBackgroundRefresh()
         }
 
