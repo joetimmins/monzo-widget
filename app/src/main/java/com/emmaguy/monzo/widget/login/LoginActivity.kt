@@ -9,7 +9,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.customtabs.CustomTabsIntent
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.text.InputType
+import android.util.Log
+import android.widget.EditText
 import com.emmaguy.monzo.widget.MonzoWidgetApp
 import com.emmaguy.monzo.widget.R
 import com.emmaguy.monzo.widget.balance.RefreshBalanceJobService
@@ -102,6 +106,18 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.LoginView {
 
     override fun hideLoading() {
         loginProgressBar.gone()
+    }
+
+    fun showMonzoMeInput() {
+        val editText = EditText(this)
+        editText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
+
+        AlertDialog.Builder(this)
+                .setTitle("Monzo.me link")
+                .setMessage("Put your Monzo.me link in here")
+                .setView(editText)
+                .setPositiveButton("Done", { _, _ -> Log.d("tag", editText.text.toString()) })
+
     }
 }
 
