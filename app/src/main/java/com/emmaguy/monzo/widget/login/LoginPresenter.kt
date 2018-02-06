@@ -96,6 +96,10 @@ class LoginPresenter(
         disposables.clear()
     }
 
+    fun storeMonzoMeLink(monzoMeLink: String) {
+//        userStorage.saveMonzoMeLink
+    }
+
     interface LoginView {
         fun loginClicks(): Observable<Unit>
         fun authCodeChanges(): Observable<Pair<String, String>>
@@ -113,5 +117,6 @@ class LoginPresenter(
 
         fun showLoggedIn()
         fun startBackgroundRefresh()
+        fun showMonzoMeInput()
     }
 }

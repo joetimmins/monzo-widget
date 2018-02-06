@@ -108,7 +108,7 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.LoginView {
         loginProgressBar.gone()
     }
 
-    fun showMonzoMeInput() {
+    override fun showMonzoMeInput() {
         val editText = EditText(this)
         editText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
 
