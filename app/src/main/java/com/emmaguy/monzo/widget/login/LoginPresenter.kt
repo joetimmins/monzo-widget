@@ -1,5 +1,6 @@
 package com.emmaguy.monzo.widget.login
 
+import android.util.Log
 import com.emmaguy.monzo.widget.UserStorage
 import com.emmaguy.monzo.widget.api.MonzoApi
 import com.emmaguy.monzo.widget.api.model.AccountType
@@ -29,8 +30,9 @@ class LoginPresenter(
         }
         view = loginView
 
-        if (userStorage.hasToken()) {
-            loginView.showLoggedIn()
+        if (userStorage.hasToken() && userStorage.hasMonzoMeLink()) {
+//            loginView.showLoggedIn()
+            loginView.showMonzoMeInput()
             loginView.startBackgroundRefresh()
         }
 
@@ -80,7 +82,8 @@ class LoginPresenter(
                 .observeOn(uiScheduler)
                 .doOnNext { loginView.hideLoading() }
                 .subscribe({
-                    loginView.showLoggedIn()
+                    // loginView.showLoggedIn()
+                    loginView.showMonzoMeInput()
                     loginView.startBackgroundRefresh()
                 }, Timber::e))
     }
@@ -95,6 +98,7 @@ class LoginPresenter(
 
     fun storeMonzoMeLink(monzoMeLink: String) {
         userStorage.saveMonzoMeLink(monzoMeLink)
+        view?.showLoggedIn() ?: run { Log.d("LoginPresenter", "view was somehow null when saving monzo.me link") }
     }
 
     interface LoginView {

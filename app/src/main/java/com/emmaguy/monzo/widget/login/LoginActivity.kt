@@ -108,6 +108,7 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.LoginView {
     }
 
     override fun showMonzoMeInput() {
+        loginButton.gone()
         val editText = EditText(this)
         editText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
 
@@ -116,7 +117,8 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.LoginView {
                 .setMessage("Put your Monzo.me link in here")
                 .setView(editText)
                 .setPositiveButton("Done", { _, _ -> presenter.storeMonzoMeLink(editText.text.toString()) })
-
+                .create()
+                .show()
     }
 }
 

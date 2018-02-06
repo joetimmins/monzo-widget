@@ -133,4 +133,10 @@ class UserStorage(context: Context) {
                 .putString(KEY_MONZO_ME_LINK, monzoMeLink)
                 .apply()
     }
+
+    fun hasMonzoMeLink(): Boolean {
+        val hasToken = hasToken()
+        val b = sharedPreferences.getString(KEY_MONZO_ME_LINK, null) != null
+        return hasToken && b
+    }
 }
