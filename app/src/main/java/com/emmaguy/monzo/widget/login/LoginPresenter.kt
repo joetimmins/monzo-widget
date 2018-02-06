@@ -94,7 +94,7 @@ class LoginPresenter(
     }
 
     fun storeMonzoMeLink(monzoMeLink: String) {
-//        userStorage.saveMonzoMeLink
+        userStorage.saveMonzoMeLink(monzoMeLink)
     }
 
     interface LoginView {

@@ -7,22 +7,26 @@ import com.emmaguy.monzo.widget.api.model.Balance
 import com.emmaguy.monzo.widget.api.model.Token
 
 class UserStorage(context: Context) {
-    private val KEY_REFRESH_TOKEN = "KEY_REFRESH_TOKEN"
-    private val KEY_ACCESS_TOKEN = "KEY_ACCESS_TOKEN"
-    private val KEY_TOKEN_TYPE = "KEY_TOKEN_TYPE"
+    private companion object {
+        private const val KEY_REFRESH_TOKEN = "KEY_REFRESH_TOKEN"
+        private const val KEY_ACCESS_TOKEN = "KEY_ACCESS_TOKEN"
+        private const val KEY_TOKEN_TYPE = "KEY_TOKEN_TYPE"
 
-    private val KEY_STATE = "KEY_STATE"
+        private const val KEY_STATE = "KEY_STATE"
 
-    private val KEY_PREPAID_ACCOUNT_ID = "KEY_PREPAID_ACCOUNT_ID"
-    private val KEY_CURRENT_ACCOUNT_ID = "KEY_CURRENT_ACCOUNT_ID"
+        private const val KEY_PREPAID_ACCOUNT_ID = "KEY_PREPAID_ACCOUNT_ID"
+        private const val KEY_CURRENT_ACCOUNT_ID = "KEY_CURRENT_ACCOUNT_ID"
 
-    private val KEY_PREPAID_CURRENCY = "KEY_PREPAID_CURRENCY"
-    private val KEY_PREPAID_BALANCE = "KEY_PREPAID_BALANCE"
+        private const val KEY_PREPAID_CURRENCY = "KEY_PREPAID_CURRENCY"
+        private const val KEY_PREPAID_BALANCE = "KEY_PREPAID_BALANCE"
 
-    private val KEY_CA_CURRENCY = "KEY_CA_CURRENCY"
-    private val KEY_CA_BALANCE = "KEY_CA_BALANCE"
+        private const val KEY_CA_CURRENCY = "KEY_CA_CURRENCY"
+        private const val KEY_CA_BALANCE = "KEY_CA_BALANCE"
 
-    private val KEY_ACCOUNT_TYPE = "KEY_ACCOUNT_TYPE"
+        private const val KEY_ACCOUNT_TYPE = "KEY_ACCOUNT_TYPE"
+
+        private const val KEY_MONZO_ME_LINK: String = "KEY_MONZO_ME_LINK"
+    }
 
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("user_storage", Context.MODE_PRIVATE)
 
@@ -121,5 +125,12 @@ class UserStorage(context: Context) {
 
     fun getRefreshToken(): String? {
         return sharedPreferences.getString(KEY_REFRESH_TOKEN, null)
+    }
+
+    fun saveMonzoMeLink(monzoMeLink: String) {
+        sharedPreferences
+                .edit()
+                .putString(KEY_MONZO_ME_LINK, monzoMeLink)
+                .apply()
     }
 }
