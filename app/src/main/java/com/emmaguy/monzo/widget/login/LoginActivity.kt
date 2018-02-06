@@ -18,6 +18,8 @@ import com.emmaguy.monzo.widget.R
 import com.emmaguy.monzo.widget.balance.RefreshBalanceJobService
 import com.emmaguy.monzo.widget.common.gone
 import com.emmaguy.monzo.widget.common.visible
+import com.emmaguy.monzo.widget.login.LastTransactionPresenter.LastTransactionEventListener
+import com.emmaguy.monzo.widget.login.LastTransactionPresenter.LastTransactionView
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
@@ -25,17 +27,18 @@ import kotlinx.android.synthetic.main.activity_login.*
 import java.util.concurrent.TimeUnit
 
 
-class LoginActivity : AppCompatActivity(), LoginPresenter.LoginView {
+class LoginActivity : AppCompatActivity(), LoginPresenter.LoginView, LastTransactionEventListener, LastTransactionView {
     private val JOB_ID = 1
     private val authCodeChangedRelay = PublishRelay.create<Pair<String, String>>()
-    private val presenter by lazy { MonzoWidgetApp.get(this).loginModule.provideLoginPresenter() }
+    private val loginPresenter by lazy { MonzoWidgetApp.get(this).loginModule.provideLoginPresenter() }
+    private val lastTransactionPresenter by lazy { MonzoWidgetApp.get(this).loginModule.provideLastTransactionPresenter(this, this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_login)
 
-        presenter.attachView(this)
+        loginPresenter.attachView(this)
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -48,7 +51,7 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.LoginView {
     }
 
     override fun onDestroy() {
-        presenter.detachView()
+        loginPresenter.detachView()
         super.onDestroy()
     }
 
@@ -117,9 +120,20 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.LoginView {
                 .setTitle("Monzo.me link")
                 .setMessage("Put your Monzo.me link in here")
                 .setView(editText)
-                .setPositiveButton("Done", { _, _ -> presenter.storeMonzoMeLink(editText.text.toString()) })
+                .setPositiveButton("Done", { _, _ -> loginPresenter.storeMonzoMeLink(editText.text.toString()) })
                 .create()
                 .show()
+    }
+
+    override fun showLastTransaction() {
+    }
+
+    override fun lastTransactionClicks(): Observable<Unit> {
+        return Observable.empty()
+    }
+
+    override fun shareClicks(): Observable<Unit> {
+        return Observable.empty()
     }
 }
 
