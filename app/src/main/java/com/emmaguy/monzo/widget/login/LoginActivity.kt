@@ -85,6 +85,7 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.LoginView {
 
     override fun showLoggedIn() {
         loginButton.gone()
+        lastTransactionButton.visible()
         instructionsTextView.text = getString(R.string.login_logged_in_body)
     }
 

@@ -14,4 +14,5 @@
   <string name="settings_title_prepaid_account">Prepaid Account</string>
   <string name="settings_title_current_account">Current account</string>
   <string name="settings_title_choose_type">Choose your account type:</string>
+  <string name="show_last_transaction">Show last transaction</string>
 </resources>
