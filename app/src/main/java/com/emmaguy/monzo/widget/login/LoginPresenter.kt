@@ -45,7 +45,8 @@ class LoginPresenter(
                             "&redirect_uri=$redirectUri" +
                             "&response_type=code" +
                             "&state=" + userStorage.state)
-                })
+                }
+        )
 
         disposables.add(loginView.authCodeChanges()
                 .doOnNext { loginView.showLoading() }

@@ -126,6 +126,7 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.LoginView, LastTransac
     }
 
     override fun showLastTransaction() {
+        
     }
 
     override fun lastTransactionClicks(): Observable<Unit> {

@@ -19,7 +19,7 @@ class LastTransactionPresenter(
         disposables.add(lastTransactionEventListener.lastTransactionClicks()
                 .subscribe {
                     // get the account id out of user storage
-                    monzoApi.transactions()
+//                    monzoApi.transactions()
                 }
         )
     }
