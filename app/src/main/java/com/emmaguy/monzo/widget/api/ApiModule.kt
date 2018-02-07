@@ -6,11 +6,13 @@ import com.emmaguy.monzo.widget.StorageModule
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.readystatesoftware.chuck.ChuckInterceptor
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Rfc3339DateJsonAdapter
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import java.io.IOException
+import java.util.*
 
 class ApiModule(
         private val context: Context,
@@ -68,10 +70,13 @@ class ApiModule(
     }
 
     private fun createMonzoApi(okHttpClient: OkHttpClient): MonzoApi {
+        val build = Moshi.Builder()
+                .add(Date::class.java, Rfc3339DateJsonAdapter())
+                .build()
         return Retrofit.Builder()
                 .baseUrl("https://api.monzo.com")
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(MoshiConverterFactory.create(Moshi.Builder().build()))
+                .addConverterFactory(MoshiConverterFactory.create(build))
                 .client(okHttpClient)
                 .build()
                 .create(MonzoApi::class.java)
