@@ -4,7 +4,7 @@
   <string name="callback_url_host">monzowidget</string>
 
   <!-- App strings -->
-  <string name="app_name">monzo widget</string>
+  <string name="app_name">Bill Splitter</string>
   <string name="login_action_title">Login</string>
   <string name="login_redirecting_body">Redirecting to browser - please follow the instructions to send a
         magic link email, then click on \'Login to Monzo\'
