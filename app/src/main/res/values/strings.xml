@@ -10,7 +10,7 @@
         magic link email, then click on \'Login to Monzo\'
     </string>
   <string name="login_logging_in_body">Logging you in…</string>
-  <string name="login_logged_in_body">Coming soon!</string>
+  <string name="login_logged_in_body">Logged in!</string>
   <string name="settings_title_prepaid_account">Prepaid Account</string>
   <string name="settings_title_current_account">Current account</string>
   <string name="settings_title_choose_type">Choose your account type:</string>

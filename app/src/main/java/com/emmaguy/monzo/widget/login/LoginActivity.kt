@@ -39,6 +39,16 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.LoginView, LastTransac
         setContentView(R.layout.activity_login)
 
         loginPresenter.attachView(this)
+
+        lastTransactionButton.setOnClickListener({
+            instructionsTextView.setText("Sainsbury's, £10.68");
+            lastTransactionButton.gone()
+            splitButton.visible()
+        })
+
+        splitButton.setOnClickListener({
+
+        })
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -117,8 +127,8 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.LoginView, LastTransac
         editText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
 
         AlertDialog.Builder(this)
-                .setTitle("Monzo.me link")
-                .setMessage("Put your Monzo.me link in here")
+                .setTitle("Add your Monzo.me link")
+                .setMessage("You can find your Monzo.me link in the Monzo app, by going to the Account section.")
                 .setView(editText)
                 .setPositiveButton("Done", { _, _ -> loginPresenter.storeMonzoMeLink(editText.text.toString()) })
                 .create()
@@ -126,7 +136,7 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.LoginView, LastTransac
     }
 
     override fun showLastTransaction() {
-        
+
     }
 
     override fun lastTransactionClicks(): Observable<Unit> {
