@@ -29,6 +29,8 @@ class LoginModule(
     fun provideLastTransactionPresenter(eventListener: LastTransactionEventListener, view: LastTransactionView): LastTransactionPresenter {
         return LastTransactionPresenter(
                 apiModule.monzoApi,
+                eventListener,
+                view,
                 AppModule.uiScheduler(),
                 AppModule.ioScheduler()
         )

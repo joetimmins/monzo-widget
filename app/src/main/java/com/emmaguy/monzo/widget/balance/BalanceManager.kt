@@ -35,7 +35,7 @@ class BalanceManager(
         return apiCallAsCompletable(accountType, apiCall)
     }
 
-    private fun apiCallAsCompletable(accountType: AccountType, apiCall: (String) -> Completable) =
+    private fun apiCallAsCompletable(accountType: AccountType, apiCall: (String) -> Completable): Completable =
             accountIdFor(accountType)?.let(apiCall) ?: Completable.complete()
 
     private fun accountIdFor(type: AccountType): String? =
